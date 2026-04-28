@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For Haze 💜</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&family=Press+Start+2P&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --purple:#9b5de5;--pink:#f72585;--blue:#4cc9f0;--soft-purple:#c77dff;
+    --dark:#0a0a14;--darker:#060610;--card-bg:rgba(155,93,229,0.07);
+    --card-border:rgba(155,93,229,0.2);--text:#e8e0f5;--muted:rgba(232,224,245,0.55);
+    --green:#39d353;--red:#ff4d6d;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--darker);color:var(--text);font-family:'DM Sans',sans-serif;overflow-x:hidden;cursor:none}
+  .cursor{position:fixed;width:10px;height:10px;background:var(--soft-purple);border-radius:50%;pointer-events:none;z-index:9999;transition:transform 0.15s ease;box-shadow:0 0 12px var(--purple)}
+  .cursor-ring{position:fixed;width:30px;height:30px;border:1px solid rgba(155,93,229,0.5);border-radius:50%;pointer-events:none;z-index:9998;transition:all 0.25s ease}
+  #starfield{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
+  section{position:relative;z-index:1;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:80px 24px}
+  #welcome{flex-direction:column;text-align:center;gap:28px}
+  .welcome-tag{font-size:0.75rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--soft-purple);opacity:0;animation:fadeUp 1s 0.3s forwards}
+  .welcome-title{font-family:'Playfair Display',serif;font-size:clamp(3.5rem,12vw,7rem);font-weight:700;line-height:1.1;background:linear-gradient(135deg,#fff 0%,var(--soft-purple) 50%,var(--blue) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;opacity:0;animation:fadeUp 1s 0.6s forwards}
+  .welcome-sub{font-size:clamp(1rem,2.5vw,1.25rem);color:var(--muted);font-style:italic;max-width:420px;opacity:0;animation:fadeUp 1s 0.9s forwards}
+  .btn-main{display:inline-block;padding:16px 44px;border-radius:50px;border:none;background:linear-gradient(135deg,var(--purple),var(--pink));color:#fff;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:500;cursor:none;letter-spacing:0.05em;position:relative;overflow:hidden;box-shadow:0 0 30px rgba(155,93,229,0.4);opacity:0;animation:fadeUp 1s 1.2s forwards;transition:transform 0.3s,box-shadow 0.3s}
+  .btn-main::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--pink),var(--purple));opacity:0;transition:opacity 0.3s}
+  .btn-main:hover{transform:translateY(-3px);box-shadow:0 0 50px rgba(247,37,133,0.5)}
+  .btn-main:hover::before{opacity:1}
+  .btn-main span{position:relative;z-index:1}
+  #story{flex-direction:column;gap:60px;max-width:800px;margin:0 auto}
+  .section-heading{font-family:'Playfair Display',serif;font-size:clamp(2rem,6vw,3.5rem);text-align:center;background:linear-gradient(90deg,var(--soft-purple),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .timeline{position:relative;display:flex;flex-direction:column;gap:0}
+  .timeline::before{content:'';position:absolute;left:20px;top:0;bottom:0;width:1px;background:linear-gradient(to bottom,transparent,var(--purple),var(--blue),transparent)}
+  .tl-item{display:flex;gap:32px;align-items:flex-start;padding:24px 0;opacity:0;transform:translateX(-20px);transition:all 0.7s ease}
+  .tl-item.visible{opacity:1;transform:translateX(0)}
+  .tl-dot{width:40px;height:40px;min-width:40px;background:var(--card-bg);border:1px solid var(--card-border);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.1rem;backdrop-filter:blur(8px);box-shadow:0 0 20px rgba(155,93,229,0.2)}
+  .tl-content h3{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:400;margin-bottom:6px}
+  .tl-content p{color:var(--muted);font-size:0.95rem;line-height:1.7}
+  #memories{flex-direction:column;gap:50px}
+  .cards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;max-width:860px;width:100%}
+  .mem-card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:20px;padding:32px 24px;text-align:center;backdrop-filter:blur(12px);transition:transform 0.35s ease,box-shadow 0.35s ease,border-color 0.35s;opacity:0;transform:translateY(20px)}
+  .mem-card.visible{opacity:1;transform:translateY(0)}
+  .mem-card:hover{transform:translateY(-8px) scale(1.02);box-shadow:0 20px 50px rgba(155,93,229,0.2);border-color:rgba(155,93,229,0.5)}
+  .mem-icon{font-size:2.5rem;margin-bottom:16px;display:block}
+  .mem-title{font-family:'Playfair Display',serif;font-size:1.1rem;margin-bottom:8px}
+  .mem-desc{color:var(--muted);font-size:0.85rem;line-height:1.6}
+  #minecraft{flex-direction:column;gap:40px;text-align:center}
+  .mc-box{background:var(--card-bg);border:1px solid rgba(76,201,240,0.2);border-radius:20px;padding:60px 40px;max-width:620px;backdrop-filter:blur(16px);position:relative;overflow:hidden}
+  .mc-box::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 0%,rgba(76,201,240,0.08) 0%,transparent 70%);pointer-events:none}
+  .mc-heading{font-family:'Press Start 2P',monospace;font-size:clamp(0.75rem,2.5vw,1rem);line-height:1.8;color:var(--blue);text-shadow:0 0 20px rgba(76,201,240,0.6);margin-bottom:20px}
+  .mc-sub{font-family:'Playfair Display',serif;font-style:italic;font-size:1.2rem;color:var(--muted);margin-bottom:32px;line-height:1.7}
+  .btn-mc{display:inline-block;padding:14px 38px;border-radius:8px;border:2px solid var(--blue);background:rgba(76,201,240,0.1);color:var(--blue);font-family:'Press Start 2P',monospace;font-size:0.65rem;cursor:none;text-shadow:0 0 10px var(--blue);box-shadow:0 0 20px rgba(76,201,240,0.2);transition:all 0.3s}
+  .btn-mc:hover{background:rgba(76,201,240,0.2);box-shadow:0 0 40px rgba(76,201,240,0.4);transform:scale(1.05)}
+  .pixel-decor{position:absolute;font-family:'Press Start 2P',monospace;font-size:0.5rem;color:rgba(76,201,240,0.15);user-select:none}
+  .pixel-decor.tl{top:12px;left:16px}.pixel-decor.tr{top:12px;right:16px}.pixel-decor.bl{bottom:12px;left:16px}.pixel-decor.br{bottom:12px;right:16px}
+  #confession{flex-direction:column;gap:40px;text-align:center;max-width:680px;margin:0 auto}
+  .conf-line{font-family:'Playfair Display',serif;font-size:clamp(1.2rem,4vw,1.7rem);line-height:1.7;opacity:0;transform:translateY(16px);transition:all 0.8s ease}
+  .conf-line.visible{opacity:1;transform:translateY(0)}
+  .conf-line em{color:var(--soft-purple);font-style:italic}
+  .conf-line strong{background:linear-gradient(90deg,var(--pink),var(--soft-purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .heartbeat{width:80px;height:80px;margin:0 auto;animation:heartbeat 1.4s ease-in-out infinite}
+  #proposal{flex-direction:column;gap:40px;text-align:center}
+  .prop-title{font-family:'Playfair Display',serif;font-size:clamp(2.5rem,9vw,5.5rem);line-height:1.15;background:linear-gradient(135deg,#fff 0%,var(--pink) 40%,var(--soft-purple) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .prop-sub{color:var(--muted);font-style:italic;font-size:1.1rem}
+  .btn-group{display:flex;gap:20px;flex-wrap:wrap;justify-content:center}
+  .btn-yes{padding:18px 52px;border-radius:50px;border:none;background:linear-gradient(135deg,#f72585,#ff6b9d);color:#fff;font-family:'DM Sans',sans-serif;font-size:1.1rem;font-weight:600;cursor:none;box-shadow:0 0 40px rgba(247,37,133,0.4);transition:all 0.3s}
+  .btn-yes:hover{transform:scale(1.08);box-shadow:0 0 60px rgba(247,37,133,0.6)}
+  .btn-no{padding:18px 44px;border-radius:50px;border:1px solid rgba(155,93,229,0.3);background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:1rem;cursor:none;transition:all 0.3s}
+  .btn-no:hover{border-color:var(--soft-purple);color:var(--text)}
+  .shayari-box{display:none;background:var(--card-bg);border:1px solid var(--card-border);border-radius:20px;padding:32px;max-width:500px;backdrop-filter:blur(16px);text-align:center;margin-top:12px}
+  .shayari-box.show{display:block;animation:fadeUp 0.5s ease}
+  .shayari-box p{font-family:'Playfair Display',serif;font-style:italic;font-size:1.1rem;line-height:1.8;color:var(--soft-purple);margin-bottom:16px;white-space:pre-line}
+  .shayari-box small{color:var(--muted);font-size:0.85rem}
+  #success-overlay{display:none;position:fixed;inset:0;z-index:100;background:rgba(6,6,16,0.92);backdrop-filter:blur(20px);flex-direction:column;align-items:center;justify-content:center;gap:24px;text-align:center;padding:40px}
+  #success-overlay.show{display:flex;animation:fadeIn 0.7s ease}
+  .success-title{font-family:'Playfair Display',serif;font-size:clamp(2rem,8vw,4.5rem);background:linear-gradient(135deg,var(--pink),var(--soft-purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .success-sub{color:var(--muted);font-size:1.1rem;max-width:420px;line-height:1.7;font-family:'Playfair Display',serif;font-style:italic}
+  #ending{flex-direction:column;gap:28px;text-align:center}
+  .ending-msg{font-family:'Playfair Display',serif;font-size:clamp(1.5rem,5vw,2.8rem);line-height:1.5;max-width:600px;opacity:0;transform:translateY(20px);transition:all 1s ease}
+  .ending-msg.visible{opacity:1;transform:translateY(0)}
+  .ending-small{color:var(--muted);font-style:italic;font-size:1rem;opacity:0;transition:all 1s 0.3s ease}
+  .ending-small.visible{opacity:1}
+  #music-btn{position:fixed;bottom:28px;right:28px;width:50px;height:50px;border-radius:50%;background:var(--card-bg);border:1px solid var(--card-border);backdrop-filter:blur(12px);color:var(--soft-purple);font-size:1.3rem;display:flex;align-items:center;justify-content:center;cursor:none;z-index:50;box-shadow:0 0 20px rgba(155,93,229,0.2);transition:all 0.3s}
+  #music-btn:hover{box-shadow:0 0 30px rgba(155,93,229,0.5);transform:scale(1.1)}
+  .divider{width:60px;height:1px;background:linear-gradient(90deg,transparent,var(--purple),transparent);margin:0 auto}
+  .floating-heart{position:fixed;pointer-events:none;z-index:0;animation:floatUp linear infinite;opacity:0.12;font-size:1rem;user-select:none}
+  .confetti-piece{position:fixed;pointer-events:none;z-index:200;animation:confettiFall 3s ease-in forwards}
+  .blob{position:fixed;border-radius:50%;filter:blur(80px);opacity:0.15;pointer-events:none;z-index:0}
+  .blob-1{width:500px;height:500px;background:var(--purple);top:-100px;left:-100px;animation:blobMove 14s ease-in-out infinite}
+  .blob-2{width:400px;height:400px;background:var(--pink);bottom:-80px;right:-80px;animation:blobMove 18s ease-in-out infinite reverse}
+  .blob-3{width:300px;height:300px;background:var(--blue);top:40%;left:50%;animation:blobMove 22s ease-in-out infinite 4s}
+
+  /* ══ ADMIN LOGIN ══ */
+  #admin-login{display:none;position:fixed;inset:0;z-index:600;background:rgba(6,6,16,0.97);align-items:center;justify-content:center;flex-direction:column;gap:0}
+  #admin-login.show{display:flex}
+  .login-box{background:var(--card-bg);border:1px solid var(--card-border);border-radius:24px;padding:48px 40px;text-align:center;max-width:380px;width:90%;backdrop-filter:blur(20px)}
+  .login-title{font-family:'Playfair Display',serif;font-size:1.9rem;margin-bottom:6px}
+  .login-sub{color:var(--muted);font-size:0.78rem;margin-bottom:28px;font-family:'JetBrains Mono',monospace;letter-spacing:0.08em}
+  .login-input{width:100%;padding:13px 16px;border-radius:10px;border:1px solid var(--card-border);background:rgba(255,255,255,0.04);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:0.9rem;margin-bottom:14px;outline:none;transition:border-color 0.2s}
+  .login-input:focus{border-color:var(--soft-purple)}
+  .login-btn{width:100%;padding:13px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--purple),var(--pink));color:#fff;font-family:'JetBrains Mono',monospace;font-size:0.85rem;cursor:pointer;font-weight:600;letter-spacing:0.06em;transition:opacity 0.2s}
+  .login-btn:hover{opacity:0.87}
+  .login-err{color:var(--red);font-size:0.75rem;font-family:'JetBrains Mono',monospace;display:none;margin-top:10px}
+
+  /* ══ ADMIN PANEL ══ */
+  #admin-panel{display:none;position:fixed;inset:0;z-index:500;background:#0a0a16;overflow-y:auto;font-family:'JetBrains Mono',monospace}
+  #admin-panel.show{display:block}
+  .adm-header{background:rgba(155,93,229,0.08);border-bottom:1px solid var(--card-border);padding:18px 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;backdrop-filter:blur(16px)}
+  .adm-logo{display:flex;align-items:center;gap:12px}
+  .adm-dot{width:9px;height:9px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:blink 2s infinite}
+  .adm-title{font-size:0.78rem;color:var(--soft-purple);letter-spacing:0.18em;text-transform:uppercase}
+  .adm-actions{display:flex;gap:10px;flex-wrap:wrap}
+  .adm-btn{padding:7px 18px;border-radius:8px;border:1px solid var(--card-border);background:transparent;color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:0.72rem;cursor:pointer;transition:all 0.2s}
+  .adm-btn:hover{border-color:var(--soft-purple);color:var(--text)}
+  .adm-btn.danger{border-color:rgba(255,77,109,0.3);color:var(--red)}
+  .adm-btn.danger:hover{background:rgba(255,77,109,0.08);border-color:var(--red)}
+  .adm-body{padding:32px;max-width:1200px;margin:0 auto}
+  .adm-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:36px}
+  .stat-card{background:rgba(155,93,229,0.06);border:1px solid var(--card-border);border-radius:14px;padding:20px 22px}
+  .stat-lbl{font-size:0.62rem;color:var(--muted);letter-spacing:0.18em;text-transform:uppercase;margin-bottom:8px}
+  .stat-val{font-size:2rem;font-weight:600}
+  .c-blue{color:var(--blue)}.c-pink{color:var(--pink)}.c-orange{color:#ff9f43}.c-purple{color:var(--soft-purple)}.c-green{color:var(--green)}
+  .adm-sec-title{font-size:0.62rem;color:var(--muted);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:14px;margin-top:28px}
+  .filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
+  .f-btn{padding:5px 14px;border-radius:20px;border:1px solid var(--card-border);background:transparent;color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:0.68rem;cursor:pointer;transition:all 0.2s}
+  .f-btn.on{border-color:var(--soft-purple);color:var(--soft-purple);background:rgba(155,93,229,0.1)}
+  .log-table{width:100%;border-collapse:collapse;font-size:0.76rem}
+  .log-table th{text-align:left;padding:10px 14px;background:rgba(155,93,229,0.09);color:var(--soft-purple);font-size:0.62rem;letter-spacing:0.16em;text-transform:uppercase;border-bottom:1px solid var(--card-border)}
+  .log-table td{padding:13px 14px;border-bottom:1px solid rgba(155,93,229,0.07);vertical-align:top;line-height:1.5}
+  .log-table tr:hover td{background:rgba(155,93,229,0.035)}
+  .badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:0.68rem;font-weight:600}
+  .b-yes{background:rgba(247,37,133,0.13);color:var(--pink);border:1px solid rgba(247,37,133,0.28)}
+  .b-no{background:rgba(255,159,67,0.13);color:#ff9f43;border:1px solid rgba(255,159,67,0.28)}
+  .b-visit{background:rgba(76,201,240,0.1);color:var(--blue);border:1px solid rgba(76,201,240,0.25)}
+  .no-data{text-align:center;padding:60px;color:var(--muted);font-size:0.82rem}
+  .no-data span{font-size:2rem;display:block;margin-bottom:12px}
+  .loading-adm{text-align:center;padding:40px;color:var(--muted);font-size:0.8rem;animation:pulse 1.5s infinite}
+  .export-hint{font-size:0.65rem;color:var(--muted);margin-top:12px;letter-spacing:0.05em}
+  .db-status{display:inline-flex;align-items:center;gap:6px;font-size:0.65rem;color:var(--green);font-family:'JetBrains Mono',monospace;margin-left:12px}
+  .db-status.err{color:var(--red)}
+  .db-dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+
+  @keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  @keyframes heartbeat{0%,100%{transform:scale(1)}14%{transform:scale(1.2)}28%{transform:scale(1)}42%{transform:scale(1.1)}70%{transform:scale(1)}}
+  @keyframes floatUp{0%{transform:translateY(110vh) rotate(0deg);opacity:0}10%{opacity:0.15}90%{opacity:0.1}100%{transform:translateY(-10vh) rotate(720deg);opacity:0}}
+  @keyframes blobMove{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(30px,-20px) scale(1.05)}66%{transform:translate(-20px,30px) scale(0.96)}}
+  @keyframes confettiFall{0%{transform:translateY(-10px) rotate(0deg);opacity:1}100%{transform:translateY(105vh) rotate(720deg);opacity:0}}
+  @keyframes bounce{0%,100%{transform:translateX(0)}25%{transform:translateX(-10px)}75%{transform:translateX(10px)}}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+  ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--darker)}::-webkit-scrollbar-thumb{background:var(--purple);border-radius:4px}
+  @media(max-width:600px){.btn-group{flex-direction:column;align-items:center}.timeline::before{left:16px}.tl-item{gap:20px}.log-table{font-size:0.68rem}.log-table td,.log-table th{padding:9px 9px}.adm-header{padding:14px 16px}.adm-body{padding:16px}}
+</style>
+</head>
+<body>
+
+<canvas id="starfield"></canvas>
+<div class="blob blob-1"></div><div class="blob blob-2"></div><div class="blob blob-3"></div>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursor-ring"></div>
+
+<audio id="bgm" loop>
+  <source src="https://cdn.pixabay.com/audio/2022/10/16/audio_87db8f2b95.mp3" type="audio/mpeg">
+</audio>
+<button id="music-btn" title="Toggle music">🎵</button>
+
+<!-- ══ ADMIN LOGIN ══ -->
+<div id="admin-login">
+  <div class="login-box">
+    <div class="login-title">🔐 Admin</div>
+    <div class="login-sub">// haze-proposal / secure zone</div>
+    <input class="login-input" type="password" id="adminPass" placeholder="password…" autocomplete="current-password"
+      onkeydown="if(event.key==='Enter')tryLogin()">
+    <button class="login-btn" onclick="tryLogin()">Enter Panel →</button>
+    <div class="login-err" id="loginErr">⚠ wrong password</div>
+  </div>
+</div>
+
+<!-- ══ ADMIN PANEL ══ -->
+<div id="admin-panel">
+  <div class="adm-header">
+    <div class="adm-logo">
+      <div class="adm-dot"></div>
+      <div class="adm-title">💜 Haze Proposal — Admin</div>
+      <span class="db-status" id="dbStatus"><span class="db-dot"></span>Supabase Connected</span>
+    </div>
+    <div class="adm-actions">
+      <button class="adm-btn" onclick="loadAdmin()">↻ Refresh</button>
+      <button class="adm-btn" onclick="exportCSV()">↓ Export CSV</button>
+      <button class="adm-btn danger" onclick="clearLogs()">✕ Clear Logs</button>
+      <button class="adm-btn danger" onclick="closeAdmin()">✕ Close</button>
+    </div>
+  </div>
+  <div class="adm-body">
+    <div class="adm-stats">
+      <div class="stat-card"><div class="stat-lbl">Total Events</div><div class="stat-val c-blue" id="sTotal">–</div></div>
+      <div class="stat-card"><div class="stat-lbl">Page Visits</div><div class="stat-val c-purple" id="sVisits">–</div></div>
+      <div class="stat-card"><div class="stat-lbl">Said Yes 💜</div><div class="stat-val c-pink" id="sYes">–</div></div>
+      <div class="stat-card"><div class="stat-lbl">Said No 🥺</div><div class="stat-val c-orange" id="sNo">–</div></div>
+      <div class="stat-card"><div class="stat-lbl">No Attempts</div><div class="stat-val c-green" id="sNoAttempts">–</div></div>
+    </div>
+    <div class="adm-sec-title">// Event Log — Live from Supabase ☁️</div>
+    <div class="filter-bar">
+      <button class="f-btn on" onclick="setFilter('all',this)">All</button>
+      <button class="f-btn" onclick="setFilter('VISIT',this)">Visits</button>
+      <button class="f-btn" onclick="setFilter('YES',this)">Yes</button>
+      <button class="f-btn" onclick="setFilter('NO',this)">No</button>
+    </div>
+    <div id="adminTable"><div class="loading-adm">Connecting to Supabase…</div></div>
+    <div class="export-hint">Tip: Press Ctrl+Shift+A anywhere to open admin. Add ?admin to URL. Data syncs from cloud ☁️</div>
+  </div>
+</div>
+
+<!-- ══ SUCCESS ══ -->
+<div id="success-overlay">
+  <div style="font-size:3.5rem;animation:heartbeat 1s infinite">💜</div>
+  <div class="success-title">She said yes! 🥺</div>
+  <div class="success-sub">"And in that moment, the whole universe felt like it was made just for the two of us."</div>
+  <div style="color:var(--muted);font-size:0.85rem;margin-top:8px">I'm the happiest right now 💜</div>
+</div>
+
+<!-- ══════════ S1 WELCOME ══════════ -->
+<section id="welcome">
+  <div class="welcome-tag">a little something for you…</div>
+  <h1 class="welcome-title">Hey Haze 💜</h1>
+  <p class="welcome-sub">This is something I made just for you…</p>
+  <button class="btn-main" onclick="scrollToStory()"><span>Click to Continue ↓</span></button>
+</section>
+
+<!-- ══════════ S2 STORY ══════════ -->
+<section id="story">
+  <h2 class="section-heading">Our Story</h2>
+  <div class="timeline">
+    <div class="tl-item"><div class="tl-dot">💬</div><div class="tl-content"><h3>It all started on Discord…</h3><p>Somewhere between server notifications and random late-night messages, you showed up — and something just felt different.</p></div></div>
+    <div class="tl-item"><div class="tl-dot">🎧</div><div class="tl-content"><h3>Songs & shared playlists</h3><p>We'd drop songs in chat like little pieces of ourselves. Every track felt like a quiet confession.</p></div></div>
+    <div class="tl-item"><div class="tl-dot">🌙</div><div class="tl-content"><h3>Late night chats that never ended</h3><p>3am conversations where time stopped existing. We forgot the world outside and just… talked.</p></div></div>
+    <div class="tl-item"><div class="tl-dot">🎙️</div><div class="tl-content"><h3>Your voice became my favourite sound</h3><p>The first VC. I still remember the warmth of it. After that, no notification felt better than yours.</p></div></div>
+    <div class="tl-item"><div class="tl-dot">✨</div><div class="tl-content"><h3>And slowly… you became special</h3><p>I didn't even notice when it happened. One day I just realised — you're the first person I want to talk to.</p></div></div>
+  </div>
+</section>
+
+<!-- ══════════ S3 MEMORIES ══════════ -->
+<section id="memories">
+  <h2 class="section-heading">Little Things I Keep</h2>
+  <div class="cards-grid">
+    <div class="mem-card"><span class="mem-icon">🎧</span><div class="mem-title">Songs Together</div><div class="mem-desc">Every playlist felt like you showing me a piece of who you are. I treasure every one.</div></div>
+    <div class="mem-card"><span class="mem-icon">🌙</span><div class="mem-title">Late Night Chats</div><div class="mem-desc">The world was asleep and we were wide awake, talking about everything and nothing.</div></div>
+    <div class="mem-card"><span class="mem-icon">🎙️</span><div class="mem-title">VC Moments</div><div class="mem-desc">Your laugh through the mic. Your voice when you got excited. I could listen forever.</div></div>
+    <div class="mem-card"><span class="mem-icon">💌</span><div class="mem-title">Random Messages</div><div class="mem-desc">A ping from you mid-day could flip my whole mood. Still does, every single time.</div></div>
+    <div class="mem-card"><span class="mem-icon">🌸</span><div class="mem-title">Just Being There</div><div class="mem-desc">You didn't have to do anything grand. Just existing in my day made it better.</div></div>
+    <div class="mem-card"><span class="mem-icon">💜</span><div class="mem-title">The Feeling</div><div class="mem-desc">That quiet warmth when I see your name pop up. That one's my favourite memory.</div></div>
+  </div>
+</section>
+
+<!-- ══════════ S4 MINECRAFT ══════════ -->
+<section id="minecraft">
+  <h2 class="section-heading">A Little Invitation</h2>
+  <div class="mc-box">
+    <span class="pixel-decor tl">⬛⬜⬛</span><span class="pixel-decor tr">⬛⬜⬛</span>
+    <span class="pixel-decor bl">⬛⬜⬛</span><span class="pixel-decor br">⬛⬜⬛</span>
+    <div class="mc-heading">[ NEW WORLD FOUND ]</div>
+    <div class="mc-sub">What if we build our own world together?<br>Somewhere that's just ours — block by block.</div>
+    <button class="btn-mc" onclick="nextSection()">▶ Join Me ❤️</button>
+  </div>
+</section>
+
+<!-- ══════════ S5 CONFESSION ══════════ -->
+<section id="confession">
+  <svg class="heartbeat" viewBox="0 0 100 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M50 70 L10 30 C5 25 5 15 15 10 C25 5 35 10 50 25 C65 10 75 5 85 10 C95 15 95 25 90 30 Z" fill="none" stroke="url(#hg)" stroke-width="2.5" stroke-linejoin="round"/>
+    <defs><linearGradient id="hg" x1="10" y1="40" x2="90" y2="40" gradientUnits="userSpaceOnUse"><stop stop-color="#f72585"/><stop offset="1" stop-color="#9b5de5"/></linearGradient></defs>
+  </svg>
+  <p class="conf-line">Somewhere between <em>those chats</em> and those <em>long calls</em>…</p>
+  <p class="conf-line" style="transition-delay:0.2s">I started looking forward to every ping,<br>every <strong>good morning</strong>, every random thought you sent.</p>
+  <p class="conf-line" style="transition-delay:0.4s">You make my days <em>softer</em>.<br>Without even trying.</p>
+  <p class="conf-line" style="transition-delay:0.6s">And I think <strong>I fell for you</strong><br>before I even realised it was happening.</p>
+</section>
+
+<!-- ══════════ S6 PROPOSAL ══════════ -->
+<section id="proposal">
+  <div class="divider"></div>
+  <h2 class="prop-title">Haze, will you<br>be mine?</h2>
+  <p class="prop-sub">No pressure. No script. Just me, asking honestly. 💜</p>
+  <div class="btn-group">
+    <button class="btn-yes" onclick="handleYes()">Yes ❤️</button>
+    <button class="btn-no" id="noBtn" onclick="handleNo()">No 🥺</button>
+  </div>
+  <div class="shayari-box" id="shayari">
+    <p id="shayariText"></p>
+    <small id="shayariNote"></small>
+  </div>
+</section>
+
+<!-- ══════════ S7 ENDING ══════════ -->
+<section id="ending">
+  <div style="font-size:2.5rem">💜</div>
+  <div class="ending-msg">"No matter what you choose — I'm glad I met you, Haze."</div>
+  <div class="ending-small">Thank you for existing in my world. Even for a little while.</div>
+</section>
+
+<script>
+// ════════════════════════════════════════
+// CONFIG — change password before sharing!
+// ════════════════════════════════════════
+const ADMIN_PASS   = 'haze2024';
+
+// ── Supabase Config ──
+const SUPABASE_URL  = 'https://wskybvnnanmxgjfhzupy.supabase.co';
+const SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indza3lidm5uYW5teGdqZmh6dXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczNTExODcsImV4cCI6MjA5MjkyNzE4N30.Gs64gHDVunhXcEN47e9RT82TS44EPqQPELKNoJLksUw';
+const TABLE         = 'logs';
+
+// ── Supabase API helper ──
+async function sbInsert(data) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}`, {
+    method: 'POST',
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=minimal'
+    },
+    body: JSON.stringify(data)
+  });
+  return res.ok;
+}
+
+async function sbSelect(filter) {
+  let url = `${SUPABASE_URL}/rest/v1/${TABLE}?order=created_at.desc`;
+  if(filter && filter !== 'all') url += `&decision=eq.${filter}`;
+  const res = await fetch(url, {
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`
+    }
+  });
+  if(!res.ok) return [];
+  return await res.json();
+}
+
+async function sbDelete() {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?id=gt.0`, {
+    method: 'DELETE',
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`
+    }
+  });
+  return res.ok;
+}
+
+// ── IP fetch ──
+let visitorIP = 'fetching…';
+fetch('https://api.ipify.org?format=json')
+  .then(r => r.json())
+  .then(d => { visitorIP = d.ip; })
+  .catch(() => { visitorIP = 'unavailable'; });
+
+// ── Session state ──
+const sessionStart = Date.now();
+let noCount = 0;
+let sessionNoAttempts = [];
+
+// ── Cursor ──
+const cur = document.getElementById('cursor'), ring = document.getElementById('cursor-ring');
+document.addEventListener('mousemove', e => {
+  cur.style.left  = e.clientX - 5  + 'px';
+  cur.style.top   = e.clientY - 5  + 'px';
+  ring.style.left = e.clientX - 15 + 'px';
+  ring.style.top  = e.clientY - 15 + 'px';
+});
+document.querySelectorAll('button,a').forEach(el => {
+  el.addEventListener('mouseenter', () => cur.style.transform = 'scale(2)');
+  el.addEventListener('mouseleave', () => cur.style.transform = 'scale(1)');
+});
+
+// ── Starfield ──
+const canvas = document.getElementById('starfield'), ctx = canvas.getContext('2d');
+let stars = [];
+function resize() { canvas.width = innerWidth; canvas.height = innerHeight; initStars(); }
+function initStars() { stars = Array.from({length:200}, () => ({x:Math.random()*canvas.width, y:Math.random()*canvas.height, r:Math.random()*1.5+0.3, o:Math.random(), s:Math.random()*0.004+0.001, d:Math.random()>.5?1:-1})); }
+function drawStars() { ctx.clearRect(0,0,canvas.width,canvas.height); stars.forEach(s=>{s.o+=s.s*s.d;if(s.o>1||s.o<0.1)s.d*=-1;ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle=`rgba(200,180,255,${s.o})`;ctx.fill()}); requestAnimationFrame(drawStars); }
+window.addEventListener('resize', resize); resize(); drawStars();
+
+// ── Floating hearts ──
+const HS = ['💜','♡','✦','·'];
+setInterval(() => { const h=document.createElement('div'); h.className='floating-heart'; h.textContent=HS[Math.floor(Math.random()*HS.length)]; h.style.left=Math.random()*100+'vw'; h.style.animationDuration=(8+Math.random()*12)+'s'; h.style.fontSize=(0.6+Math.random()*1.2)+'rem'; document.body.appendChild(h); setTimeout(()=>h.remove(),22000); }, 1400);
+
+// ── Scroll reveal ──
+const obs = new IntersectionObserver(entries => entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); }), {threshold:0.15});
+document.querySelectorAll('.tl-item,.mem-card,.conf-line,.ending-msg,.ending-small').forEach(el => obs.observe(el));
+
+// ── Nav ──
+function scrollToStory() { document.getElementById('story').scrollIntoView({behavior:'smooth'}); }
+function nextSection()   { document.getElementById('confession').scrollIntoView({behavior:'smooth'}); }
+
+// ── Music ──
+const bgm = document.getElementById('bgm'), mBtn = document.getElementById('music-btn');
+let playing = false;
+mBtn.addEventListener('click', () => { playing ? bgm.pause() : bgm.play(); playing=!playing; mBtn.textContent=playing?'🔇':'🎵'; });
+document.addEventListener('click', () => { bgm.volume = 0.4; }, {once:true});
+
+// ── Confetti ──
+function spawnConfetti() {
+  const cols = ['#f72585','#9b5de5','#4cc9f0','#ff6b9d','#c77dff','#fff'];
+  for(let i=0;i<80;i++) setTimeout(() => { const c=document.createElement('div'); c.className='confetti-piece'; c.style.left=Math.random()*100+'vw'; c.style.top='-10px'; c.style.background=cols[Math.floor(Math.random()*cols.length)]; c.style.width=(6+Math.random()*8)+'px'; c.style.height=(6+Math.random()*8)+'px'; c.style.borderRadius=Math.random()>.5?'50%':'2px'; c.style.animationDuration=(2+Math.random()*2)+'s'; document.body.appendChild(c); setTimeout(()=>c.remove(),4000); }, i*40);
+}
+
+// ── Shayaris ──
+const SHAYARIS = [
+  { text: '"Mujhe pata hai dil mein kahin,\nek jagah hai meri bhi —\nwarna itni si baat pe\ntujhe mushkil kyun hoti?"',          note:'Dil se soch ke dekh ek baar… 💜' },
+  { text: '"Inkaar karna aasaan hai,\npar jo dil ke paas ho,\nusse door karna mushkil —\ntu bhi jaanti hai yeh baat."',           note:'Ek baar aur soch lo 🌙' },
+  { text: '"Chaand bhi kabhi na ne nahi kehta,\njab taarey usse bulate hain —\ntu bhi mat keh \'na\' mujhe,\njab dil ke taare jaagte hain."', note:'Teri haan ka intezaar hai… 💜' }
+];
+
+function elapsed() { return Math.round((Date.now()-sessionStart)/1000)+'s'; }
+
+// ── Push log to Supabase ──
+async function pushLog(entry) {
+  try {
+    await sbInsert({
+      ip:          entry.ip,
+      decision:    entry.decision,
+      shayari_count: entry.noAttempts || 0,
+      shayaris_shown: entry.noReplies ? JSON.stringify(entry.noReplies) : '[]',
+      device:      entry.ua,
+      time_spent:  entry.timeOnSite
+    });
+  } catch(e) {
+    console.warn('Supabase log failed:', e);
+  }
+}
+
+// ── YES ──
+function handleYes() {
+  spawnConfetti(); bgm.play(); playing=true; mBtn.textContent='🔇';
+  document.getElementById('success-overlay').classList.add('show');
+  pushLog({ ip:visitorIP, decision:'YES', timeOnSite:elapsed(), noAttempts:noCount, noReplies:sessionNoAttempts, ua:navigator.userAgent.substring(0,100) });
+}
+
+// ── NO ──
+function handleNo() {
+  const nb = document.getElementById('noBtn');
+  nb.style.animation='bounce 0.4s ease'; setTimeout(()=>nb.style.animation='',400);
+  const s = SHAYARIS[Math.min(noCount, SHAYARIS.length-1)];
+  document.getElementById('shayariText').textContent = s.text;
+  document.getElementById('shayariNote').textContent = s.note;
+  document.getElementById('shayari').classList.add('show');
+  const attempt = { n:noCount+1, shayari:s.text.split('\n')[0], ts:new Date().toISOString() };
+  sessionNoAttempts.push(attempt);
+  noCount++;
+  if(noCount>=3) nb.style.display='none';
+  pushLog({ ip:visitorIP, decision:'NO', timeOnSite:elapsed(), noAttempts:noCount, noReplies:[...sessionNoAttempts], ua:navigator.userAgent.substring(0,100) });
+}
+
+// ── Success close ──
+document.getElementById('success-overlay').addEventListener('click', () => {
+  document.getElementById('ending').scrollIntoView({behavior:'smooth'});
+  document.getElementById('success-overlay').classList.remove('show');
+});
+
+// ══════════════════
+//   ADMIN SYSTEM
+// ══════════════════
+function checkAdminRoute() {
+  if(window.location.search.includes('admin') || window.location.hash==='#admin') openAdminLogin();
+}
+document.addEventListener('keydown', e => { if(e.ctrlKey&&e.shiftKey&&e.key==='A') openAdminLogin(); });
+
+function openAdminLogin() { document.getElementById('admin-login').classList.add('show'); setTimeout(()=>document.getElementById('adminPass').focus(),100); }
+
+function tryLogin() {
+  const v = document.getElementById('adminPass').value;
+  const err = document.getElementById('loginErr');
+  if(v === ADMIN_PASS) {
+    document.getElementById('admin-login').classList.remove('show');
+    document.getElementById('admin-panel').classList.add('show');
+    loadAdmin();
+  } else {
+    err.style.display='block';
+    document.getElementById('adminPass').value='';
+    setTimeout(()=>err.style.display='none',2000);
+  }
+}
+
+function closeAdmin() { document.getElementById('admin-panel').classList.remove('show'); }
+
+let activeFilter = 'all';
+window._logs = [];
+
+function setFilter(f, btn) {
+  activeFilter = f;
+  document.querySelectorAll('.f-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  renderTable(window._logs);
+}
+
+async function loadAdmin() {
+  document.getElementById('adminTable').innerHTML = '<div class="loading-adm">Fetching from Supabase ☁️…</div>';
+  const dbStat = document.getElementById('dbStatus');
+
+  try {
+    const logs = await sbSelect();
+    window._logs = logs;
+
+    dbStat.className = 'db-status';
+    dbStat.innerHTML = '<span class="db-dot"></span>Supabase Connected';
+
+    const yes   = logs.filter(l=>l.decision==='YES');
+    const no    = logs.filter(l=>l.decision==='NO');
+    const visit = logs.filter(l=>l.decision==='VISIT');
+    const totalNoAttempts = logs.reduce((a,l)=>a+(l.shayari_count||0),0);
+
+    document.getElementById('sTotal').textContent     = logs.length;
+    document.getElementById('sVisits').textContent    = visit.length;
+    document.getElementById('sYes').textContent       = yes.length;
+    document.getElementById('sNo').textContent        = no.length;
+    document.getElementById('sNoAttempts').textContent= totalNoAttempts;
+
+    renderTable(logs);
+  } catch(e) {
+    dbStat.className = 'db-status err';
+    dbStat.innerHTML = '<span class="db-dot"></span>Connection Error';
+    document.getElementById('adminTable').innerHTML = '<div class="no-data"><span>⚠️</span>Could not connect to Supabase.<br>Check your internet connection.</div>';
+  }
+}
+
+function renderTable(logs) {
+  let filtered = logs;
+  if(activeFilter !== 'all') filtered = logs.filter(l=>l.decision===activeFilter);
+
+  if(!filtered.length) {
+    document.getElementById('adminTable').innerHTML = '<div class="no-data"><span>📭</span>No entries yet.<br>Share the link with Haze!</div>';
+    return;
+  }
+
+  const rows = filtered.map(log => {
+    const d   = new Date(log.created_at);
+    const ts  = d.toLocaleString('en-IN',{timeZone:'Asia/Kolkata',day:'2-digit',month:'short',year:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true});
+    const badge = log.decision==='YES'  ? '<span class="badge b-yes">❤️ YES</span>'
+                : log.decision==='NO'   ? '<span class="badge b-no">🥺 NO</span>'
+                :                         '<span class="badge b-visit">👁 VISIT</span>';
+
+    let shayarisHtml = '<span style="color:rgba(255,255,255,0.2);font-size:0.68rem">—</span>';
+    try {
+      const noReplies = typeof log.shayaris_shown === 'string' ? JSON.parse(log.shayaris_shown) : (log.shayaris_shown || []);
+      if(noReplies.length) {
+        shayarisHtml = noReplies.map(r=>`<div style="margin-bottom:4px;font-size:0.66rem;color:var(--soft-purple)">Attempt ${r.n}: "${r.shayari}"</div>`).join('');
+      }
+    } catch(e){}
+
+    const ua = (log.device||'').replace(/\(.*?\)/g,'').substring(0,55);
+    return `<tr>
+      <td style="color:var(--blue);font-size:0.75rem;white-space:nowrap">${log.ip||'—'}</td>
+      <td>${badge}</td>
+      <td style="color:var(--muted);font-size:0.7rem;white-space:nowrap">${ts}<br><span style="color:rgba(255,255,255,0.2);font-size:0.62rem">on site: ${log.time_spent||'—'}</span></td>
+      <td style="text-align:center;color:var(--soft-purple)">${log.shayari_count||0}</td>
+      <td>${shayarisHtml}</td>
+      <td style="color:rgba(255,255,255,0.18);font-size:0.62rem;max-width:140px;word-break:break-all">${ua}…</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('adminTable').innerHTML = `
+    <table class="log-table">
+      <thead><tr>
+        <th>IP Address</th><th>Decision</th><th>Time (IST)</th>
+        <th>No ×</th><th>Shayaris Shown</th><th>Device</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+
+async function clearLogs() {
+  if(!confirm('Delete ALL logs from Supabase? Cannot undo.')) return;
+  document.getElementById('adminTable').innerHTML = '<div class="loading-adm">Deleting…</div>';
+  const ok = await sbDelete();
+  if(ok) { window._logs = []; loadAdmin(); }
+  else { alert('Delete failed. Try again.'); }
+}
+
+function exportCSV() {
+  const logs = window._logs;
+  if(!logs.length) { alert('No logs to export.'); return; }
+  const headers = ['ID','IP','Decision','Timestamp(IST)','TimeOnSite','NoAttempts','Shayaris','UserAgent'];
+  const rows = logs.map(l=>{
+    const d = new Date(l.created_at);
+    const ts = d.toLocaleString('en-IN',{timeZone:'Asia/Kolkata'});
+    let shayaris = '';
+    try { shayaris = (typeof l.shayaris_shown === 'string' ? JSON.parse(l.shayaris_shown) : l.shayaris_shown||[]).map(r=>r.shayari).join(' | '); } catch(e){}
+    return [l.id, l.ip, l.decision, ts, l.time_spent, l.shayari_count||0, shayaris, (l.device||'').replace(/,/g,';')]
+      .map(v=>`"${v}"`).join(',');
+  });
+  const csv = [headers.join(','), ...rows].join('\n');
+  const blob = new Blob([csv], {type:'text/csv'});
+  const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='haze-logs.csv'; a.click();
+}
+
+// ── Log visit on page load ──
+window.addEventListener('load', () => {
+  checkAdminRoute();
+  if(!sessionStorage.getItem('v1')) {
+    sessionStorage.setItem('v1','1');
+    setTimeout(() => {
+      pushLog({ ip:visitorIP, decision:'VISIT', timeOnSite:'0s', noAttempts:0, noReplies:[], ua:navigator.userAgent.substring(0,100) });
+    }, 2500);
+  }
+});
+</script>
+</body>
+</html>
